@@ -1,4 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "hello_world": "Hello, {name} from bn!"
+  "add_button": "যোগ করুন",
+  "add_task_placeholder": "আজ কী করতে হবে?",
+  "delete_button": "মুছে ফেলুন",
+  "tasks_description": "আপনার দৈনন্দিন কাজগুলো নিচে পরিচালনা করুন।",
+  "todo_title": "কাজের তালিকা"
 }
