@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "oven.bun-vscode",
+    "tamasfe.even-better-toml",
+    "usernamehw.errorlens",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "svelte.svelte-vscode",
+    "bradlc.vscode-tailwindcss"
+  ]
+}
