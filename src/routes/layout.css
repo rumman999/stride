@@ -131,7 +131,7 @@
   }
 }
 
-/* Tiptap / IDE specific styling */
+/* Tiptap / IDE specific styling utilizing global theme variables */
 @layer base {
   .tiptap:focus {
     outline: none !important;
@@ -148,35 +148,34 @@
     color: inherit;
   }
 
-  /* IDE Syntax Highlighting Tokens */
   .hljs-keyword, 
   .hljs-operator, 
   .hljs-pattern-match { 
-    color: #f97583; 
+    color: var(--primary); 
   }
   
   .hljs-function, 
   .hljs-title { 
-    color: #b392f0; 
+    color: var(--chart-1); 
   }
   
   .hljs-string, 
   .hljs-meta .hljs-string { 
-    color: #9ecbff; 
+    color: var(--chart-2); 
   }
   
   .hljs-built_in, 
   .hljs-type { 
-    color: #79b8ff; 
+    color: var(--chart-3); 
   }
   
   .hljs-number, 
   .hljs-symbol { 
-    color: #fce6f3; 
+    color: var(--chart-4); 
   }
   
   .hljs-comment { 
-    color: #6a737d; 
+    color: var(--muted-foreground); 
     font-style: italic; 
   }
 }
