@@ -1,0 +1,13 @@
+.git
+.svelte-kit
+build
+node_modules
+# Allow .env files so Dokploy's generated .env can be used during build
+!.env
+!.env.*
+!.env.example
+.vercel
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
