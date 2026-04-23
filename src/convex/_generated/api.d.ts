@@ -9,12 +9,7 @@
  */
 
 import type * as snapshots from "../snapshots.js";
-import type * as tasks from "../tasks.js";
-
-import type * as tasks from "../tasks.js";
 import type * as test_j0 from "../test_j0.js";
-
-import type { ApiFromModules, FilterApi, FunctionReference } from 'convex/server';
 
 import type {
   ApiFromModules,
@@ -24,7 +19,6 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   snapshots: typeof snapshots;
-  tasks: typeof tasks;
   test_j0: typeof test_j0;
 }>;
 
