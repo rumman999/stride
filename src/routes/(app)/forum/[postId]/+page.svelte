@@ -9,7 +9,7 @@
   import { Separator } from '$lib/components/ui/separator/index.js';
 
   // Svelte 5 state
-  type User = { id: number; name: string; bio: string; };
+  type User = { id: number; name: string; bio: string };
   let search = $state('');
   let selectedUser = $state<User | null>(null);
 
@@ -128,7 +128,9 @@
           role="button"
           tabindex="0"
           onclick={() => openUser(user)}
-          onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') openUser(user); }}
+          onkeydown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') openUser(user);
+          }}
         >
           <div class="flex items-center gap-3">
             <Avatar>
