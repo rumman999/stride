@@ -9,6 +9,7 @@
   import PlayCircleIcon from '@lucide/svelte/icons/play-circle';
   import { useQuery } from 'convex-svelte';
 
+  import { goto } from '$app/navigation';
   import { api } from '$convex/_generated/api.js';
 
   import * as Collapsible from '$lib/components/ui/collapsible/index.js';
@@ -62,7 +63,11 @@
                       <a
                         href="/sections/{section._id}"
                         class="flex-1 truncate hover:underline"
-                        onclick={(e) => e.stopPropagation()}
+                        onclick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          goto(`/sections/${section._id}`);
+                        }}
                       >
                         {section.name}
                       </a>
