@@ -31,108 +31,108 @@ function avatar(email: string) {
 
 // --- SEED DATA ---
 
-const DEFAULT_PASS = 'password123';
+const DEFAULT_PASS = 'pass123';
 const NOW = Date.now();
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
 const USERS = [
   // 0: Admin
-  { name: 'Admin', email: 'admin@stride.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'admin' as const },
+  { name: 'Stride Admin', email: 'admin@uiu.bd', passwordHash: DEFAULT_PASS, role: 'admin' as const },
 
   // 1-21: UIU Teachers
-  { name: 'Sidratul Muntaha', email: 'sidratul@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Asnuva Tanvin', email: 'tanvin@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Tasmin Sanjida', email: 'sanjida@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Sidratul Muntaha', email: 'sidratul@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Asnuva Tanvin', email: 'tanvin@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Tasmin Sanjida', email: 'sanjida@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
   { name: 'A.H.M. Osama Haque', email: 'haqueosama1@gmail.com', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
   {
     name: 'Sidratul Tanzila Tasmi',
-    email: 'tanzila@cse.uiu.ac.bd',
+    email: 'tanzila@uiu.bd',
     passwordHash: DEFAULT_PASS,
     role: 'teacher' as const,
   },
-  { name: 'Humaira Anzum Neha', email: 'humaira@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Humaira Anzum Neha', email: 'humaira@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
   {
     name: 'Md. Mushfiqul Haque Omi',
-    email: 'mushfiqul@cse.uiu.ac.bd',
+    email: 'mushfiqul@uiu.bd',
     passwordHash: DEFAULT_PASS,
     role: 'teacher' as const,
   },
   {
     name: 'Charles Aunkan Gomes',
-    email: 'charles@cse.uiu.ac.bd',
+    email: 'charles@uiu.bd',
     passwordHash: DEFAULT_PASS,
     role: 'teacher' as const,
   },
-  { name: 'Umama Rahman', email: 'umama@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Md. Shadman Aadeeb', email: 'shadman@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Umama Rahman', email: 'umama@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Md. Shadman Aadeeb', email: 'shadman@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
   {
     name: 'Md. Shafqat Talukder',
-    email: 'shafqat@cse.uiu.ac.bd',
+    email: 'shafqat@uiu.bd',
     passwordHash: DEFAULT_PASS,
     role: 'teacher' as const,
   },
-  { name: 'Asif Ahmed Utsa', email: 'asif@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Md. Tanvir Raihan', email: 'tanvir@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Kazi Abdun Noor', email: 'abdunnoor@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Md. Tarek Hasan', email: 'tarek@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Nabila Sabrin Sworna', email: 'nabila@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Samin Sharaf Somik', email: 'samin@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Md. Romizul Islam', email: 'romizul@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Farhan Anan Himu', email: 'himu@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Shoib Ahmed Shourav', email: 'shoib@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'Anika Tasnim Rodela', email: 'anika@cse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Asif Ahmed Utsa', email: 'asif@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Md. Tanvir Raihan', email: 'tanvir@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Kazi Abdun Noor', email: 'abdunnoor@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Md. Tarek Hasan', email: 'tarek@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Nabila Sabrin Sworna', email: 'nabila@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Samin Sharaf Somik', email: 'samin@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Md. Romizul Islam', email: 'romizul@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Farhan Anan Himu', email: 'himu@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Shoib Ahmed Shourav', email: 'shoib@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'Anika Tasnim Rodela', email: 'anika@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
 
   // 22-51: UIU Students (30 Total)
-  { name: 'Rakibul Hasan', email: 'rhasan21@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Rakibul Hasan', email: 'rhasan21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
   {
     name: 'Sadia Tabassum',
-    email: 'stabassum22@bscse.uiu.ac.bd',
+    email: 'stabassum22@uiu.bd',
     passwordHash: DEFAULT_PASS,
     role: 'student' as const,
   },
-  { name: 'Nafis Ahmed', email: 'nahmed22@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Fahim Faisal', email: 'ffaisal23@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Nafis Ahmed', email: 'nahmed22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Fahim Faisal', email: 'ffaisal23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
   {
     name: 'Jannatul Ferdous',
-    email: 'jferdous23@bscse.uiu.ac.bd',
+    email: 'jferdous23@uiu.bd',
     passwordHash: DEFAULT_PASS,
     role: 'student' as const,
   },
-  { name: 'Tanmoy Das', email: 'tdas23@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Mehedi Hasan', email: 'mhasan21@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Nusrat Jahan', email: 'njahan22@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Arif Mahmud', email: 'amahmud21@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Farhan Ahmed', email: 'fahmed23@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Mehnaz Islam', email: 'mislam22@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Rafiq Uddin', email: 'ruddin21@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Nabila Rahman', email: 'nrahman23@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Tahmid Hasan', email: 'thasan22@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Ashikur Rahman', email: 'arahman21@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Sumaiya Akter', email: 'sakter23@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Kawsar Ahmed', email: 'kahmed22@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Ritu Parna', email: 'rparna21@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Shakib Al Hasan', email: 'shasan23@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Habiba Khatun', email: 'hkhatun22@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Imran Hossain', email: 'ihossain21@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Jui Barua', email: 'jbarua23@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Kamal Uddin', email: 'kuddin22@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Lamiya Haque', email: 'lhaque21@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Mahmudul Hasan', email: 'mahmudul23@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Tanmoy Das', email: 'tdas23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Mehedi Hasan', email: 'mhasan21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Nusrat Jahan', email: 'njahan22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Arif Mahmud', email: 'amahmud21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Farhan Ahmed', email: 'fahmed23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Mehnaz Islam', email: 'mislam22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Rafiq Uddin', email: 'ruddin21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Nabila Rahman', email: 'nrahman23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Tahmid Hasan', email: 'thasan22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Ashikur Rahman', email: 'arahman21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Sumaiya Akter', email: 'sakter23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Kawsar Ahmed', email: 'kahmed22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Ritu Parna', email: 'rparna21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Shakib Al Hasan', email: 'shasan23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Habiba Khatun', email: 'hkhatun22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Imran Hossain', email: 'ihossain21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Jui Barua', email: 'jbarua23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Kamal Uddin', email: 'kuddin22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Lamiya Haque', email: 'lhaque21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Mahmudul Hasan', email: 'mahmudul23@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
   {
     name: 'Nipa Chowdhury',
-    email: 'nchowdhury22@bscse.uiu.ac.bd',
+    email: 'nchowdhury22@uiu.bd',
     passwordHash: DEFAULT_PASS,
     role: 'student' as const,
   },
-  { name: 'Osman Gani', email: 'ogani21@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Osman Gani', email: 'ogani21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
   {
     name: 'Parveen Sultana',
-    email: 'psultana23@bscse.uiu.ac.bd',
+    email: 'psultana23@uiu.bd',
     passwordHash: DEFAULT_PASS,
     role: 'student' as const,
   },
-  { name: 'Qazi Anwar', email: 'qanwar22@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
-  { name: 'Rina Begum', email: 'rbegum21@bscse.uiu.ac.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Qazi Anwar', email: 'qanwar22@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
+  { name: 'Rina Begum', email: 'rbegum21@uiu.bd', passwordHash: DEFAULT_PASS, role: 'student' as const },
 ];
 
 const SECTIONS = [
@@ -277,11 +277,15 @@ const MESSAGES = [
   { chatIndex: 0, senderIndex: 26, content: 'Sir, will the assignment deadline be extended?' },
 ];
 
+// --- SEEDING LOGIC ---
+
 export default internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now();
 
+    // 1. WIPE EVERYTHING
+    console.log('Wiping existing data...');
     for (const table of TABLES) {
       const docs = await ctx.db.query(table as TableNames).collect();
       for (const doc of docs) {
@@ -289,6 +293,7 @@ export default internalMutation({
       }
     }
 
+    // 2. SEED USERS (WITH DYNAMIC AVATARS)
     const userIds: Id<'users'>[] = [];
     for (const u of USERS) {
       const userId = await ctx.db.insert('users', {
@@ -300,12 +305,14 @@ export default internalMutation({
       userIds.push(userId);
     }
 
+    // 3. SEED SECTIONS
     const sectionIds: Id<'sections'>[] = [];
     for (const s of SECTIONS) {
       const sectionId = await ctx.db.insert('sections', { ...s, createdAt: now, updatedAt: now });
       sectionIds.push(sectionId);
     }
 
+    // 4. JOIN TEACHERS & STUDENTS
     for (const st of SECTION_TEACHERS) {
       await ctx.db.insert('sectionTeachers', {
         sectionId: sectionIds[st.sectionIndex],
@@ -321,6 +328,7 @@ export default internalMutation({
       });
     }
 
+    // 5. SEED ACTIVITIES
     const activityIds: Id<'activities'>[] = [];
     for (const a of ACTIVITIES) {
       const { sectionIndex, ...fields } = a;
@@ -333,6 +341,7 @@ export default internalMutation({
       activityIds.push(activityId);
     }
 
+    // 6. SEED PROBLEMS & TEST CASES
     const problemIds: Id<'problems'>[] = [];
     for (const p of PROBLEMS) {
       const { creatorIndex, ...fields } = p;
@@ -349,6 +358,7 @@ export default internalMutation({
       await ctx.db.insert('problemIos', { ...fields, problemId: problemIds[problemIndex] });
     }
 
+    // 7. JOIN ACTIVITIES & PROBLEMS
     for (const ap of ACTIVITY_PROBLEMS) {
       await ctx.db.insert('activityProblems', {
         activityId: activityIds[ap.activityIndex],
@@ -358,6 +368,7 @@ export default internalMutation({
       });
     }
 
+    // 8. SEED TAGS, POSTS & COMMENTS
     const tagIds: Id<'tags'>[] = [];
     for (const t of TAGS) {
       tagIds.push(await ctx.db.insert('tags', t));
@@ -396,6 +407,7 @@ export default internalMutation({
       commentIds.push(commentId);
     }
 
+    // 9. SEED CHATS & MESSAGES
     const chatIds: Id<'chats'>[] = [];
     for (const c of CHATS) {
       chatIds.push(await ctx.db.insert('chats', { ...c, createdAt: now }));
