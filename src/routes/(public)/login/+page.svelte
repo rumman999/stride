@@ -1,7 +1,5 @@
 <script lang="ts">
   import { useConvexClient } from 'convex-svelte';
-  import { onMount } from 'svelte';
-  import type { HTMLAttributes } from 'svelte/elements';
 
   import { goto } from '$app/navigation';
   import { api } from '$convex/_generated/api.js';
@@ -11,6 +9,7 @@
   import * as Card from '$lib/components/ui/card/index.js';
   import { Field, FieldDescription, FieldGroup, FieldLabel } from '$lib/components/ui/field/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
+  import { Spinner } from '$lib/components/ui/spinner/index.js';
   import { setSession } from '$lib/session';
 
   const id = $props.id();
@@ -24,7 +23,6 @@
 
   async function onSubmit(e: SubmitEvent) {
     e.preventDefault();
-    console.log('submitting');
     error = null;
     loading = true;
 
@@ -72,7 +70,17 @@
                 <Input id="password-{id}" type="password" required bind:value={password} />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                {#if error}
+                  <div class="mb-2 text-sm font-medium text-destructive">{error}</div>
+                {/if}
+                <Button type="submit" class="w-full" disabled={loading}>
+                  {#if loading}
+                    <Spinner class="mr-2 h-4 w-4" />
+                    Logging in...
+                  {:else}
+                    Login
+                  {/if}
+                </Button>
               </Field>
               <div class="mt-4 text-center text-sm">
                 <a href="/forgot-password" class="underline underline-offset-4 hover:text-primary">
@@ -94,10 +102,6 @@
           </div>
         </Card.Content>
       </Card.Root>
-
-      {#if error}
-        <div class="text-sm text-destructive">{error}</div>
-      {/if}
 
       <FieldDescription class="px-6 text-center">
         By clicking continue, you agree to our <a href="##">Terms of Service</a> and
