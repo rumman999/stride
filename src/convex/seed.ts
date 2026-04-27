@@ -31,7 +31,7 @@ function avatar(email: string) {
 
 // --- SEED DATA ---
 
-const DEFAULT_PASS = 'pass123';
+const DEFAULT_PASS = 'pass';
 const NOW = Date.now();
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
@@ -43,7 +43,7 @@ const USERS = [
   { name: 'Sidratul Muntaha', email: 'sidratul@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
   { name: 'Asnuva Tanvin', email: 'tanvin@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
   { name: 'Tasmin Sanjida', email: 'sanjida@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
-  { name: 'A.H.M. Osama Haque', email: 'haqueosama1@gmail.com', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
+  { name: 'A.H.M. Osama Haque', email: 'haqueosama1@uiu.bd', passwordHash: DEFAULT_PASS, role: 'teacher' as const },
   {
     name: 'Sidratul Tanzila Tasmi',
     email: 'tanzila@uiu.bd',
