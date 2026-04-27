@@ -11,10 +11,10 @@ RUN bun install --frozen-lockfile
 # Copy project files
 COPY . .
 
-# Generate Convex files (requires CONVEX_DEPLOY_KEY)
+# Deploy backend and generate files (requires CONVEX_DEPLOY_KEY)
 ARG CONVEX_DEPLOY_KEY
 ARG CONVEX_URL
-RUN CONVEX_DEPLOY_KEY=$CONVEX_DEPLOY_KEY CONVEX_URL=$CONVEX_URL bunx convex codegen
+RUN CONVEX_DEPLOY_KEY=$CONVEX_DEPLOY_KEY CONVEX_URL=$CONVEX_URL bunx convex deploy
 
 # Build the project
 RUN bun run build
