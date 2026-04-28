@@ -8,17 +8,19 @@
   import { common, createLowlight } from 'lowlight';
   import { onDestroy, onMount } from 'svelte';
 
-  let { initialContent = '', language = 'cpp', onUpdate } = $props();
+  // ✅ Svelte 5 props
+  let { initialContent = '', language = 'cpp', onUpdate, editable = true } = $props();
 
   let element: HTMLElement;
-  let editor = $state.raw<Editor>();
+
+  // ✅ Svelte 5 state
+  let editor = $state<Editor | null>(null);
+
   const lowlight = createLowlight(common);
 
-  // Upgrade to a full IDE Helper Extension
   const IDEHelper = Extension.create({
     name: 'ideHelper',
     addKeyboardShortcuts() {
-      // Helper to insert a pair like "{}" and put cursor in the middle
       const insertPair = (pair: string) => () => {
         const pos = this.editor.state.selection.from;
         this.editor
@@ -30,30 +32,23 @@
       };
 
       return {
-        // 1. Maintain Tab for spacing
         Tab: () => {
           this.editor.commands.insertContent('  ');
           return true;
         },
 
-        // 2. Auto-close brackets and quotes
         '(': insertPair('()'),
         '[': insertPair('[]'),
         '{': insertPair('{}'),
         '"': insertPair('""'),
         "'": insertPair("''"),
 
-        // 3. Smart Enter (Auto-indentation)
-        // 3. Smart Enter (Auto-indentation)
         Enter: () => {
           if (!this.editor.isActive('codeBlock')) return false;
 
           const { state } = this.editor;
-
-          // FIX: Access the property directly without destructuring it to a $ variable
           const fromPos = state.selection.$from;
 
-          // Get the text right before the cursor
           const textNode = fromPos.nodeBefore;
           let leadingSpace = '';
 
@@ -82,22 +77,27 @@
 
   onMount(() => {
     editor = new Editor({
-      element: element,
+      element,
+      editable, // ✅ IMPORTANT
       autofocus: 'end',
+
       editorProps: {
         attributes: {
           spellcheck: 'false',
           class: 'focus:outline-none min-h-full font-mono text-sm leading-relaxed',
         },
       },
+
       extensions: [Document, Paragraph, Text, History, CodeBlockLowlight.configure({ lowlight }), IDEHelper],
+
       content: `<pre><code class="language-${language}">${initialContent}</code></pre>`,
 
       onUpdate: ({ editor: e }) => {
         if (!e.isActive('codeBlock')) {
           e.commands.setCodeBlock({ language });
         }
-        if (onUpdate) onUpdate(e.getText());
+
+        onUpdate?.(e.getText());
       },
 
       onSelectionUpdate: ({ editor: e }) => {
@@ -108,20 +108,20 @@
     });
   });
 
+  // ✅ reactive sync for Svelte 5 props change
+  $effect(() => {
+    if (editor) {
+      editor.setEditable(editable);
+    }
+  });
+
   onDestroy(() => {
-    if (editor) editor.destroy();
+    editor?.destroy();
   });
 </script>
 
 <div class="flex h-full w-full flex-col overflow-hidden bg-[#18181b] text-zinc-100">
-  <div
-    class="flex-1 cursor-text overflow-y-auto p-6"
-    role="presentation"
-    onclick={() => editor?.chain().focus().run()}
-    onkeydown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') editor?.chain().focus().run();
-    }}
-  >
+  <div class="flex-1 overflow-y-auto p-6">
     <div bind:this={element}></div>
   </div>
 </div>

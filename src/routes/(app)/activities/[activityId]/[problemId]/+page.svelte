@@ -1,14 +1,4 @@
 <script lang="ts">
-  import Archive from '@lucide/svelte/icons/archive';
-  import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-  import ArrowRight from '@lucide/svelte/icons/arrow-right';
-  import CalendarPlus from '@lucide/svelte/icons/calendar-plus';
-  import Clock from '@lucide/svelte/icons/clock';
-  import ListFilter from '@lucide/svelte/icons/list-filter';
-  import MailCheck from '@lucide/svelte/icons/mail-check';
-  import MoreHorizontal from '@lucide/svelte/icons/more-horizontal';
-  import Tag from '@lucide/svelte/icons/tag';
-  import Trash2 from '@lucide/svelte/icons/trash-2';
   import { useQuery } from 'convex-svelte';
   import DOMPurify from 'isomorphic-dompurify';
 
@@ -16,37 +6,83 @@
   import { api } from '$convex/_generated/api.js';
   import type { Id } from '$convex/_generated/dataModel';
 
-  import * as ButtonGroup from '$lib/components/ui/button-group/index.js';
+  import LanguageSelect from '$lib/components/language-select.svelte';
   import { Button } from '$lib/components/ui/button/index.js';
-  import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
   import * as Resizable from '$lib/components/ui/resizable/index.js';
+  import { Spinner } from '$lib/components/ui/spinner/index.js';
+  import * as Tabs from '$lib/components/ui/tabs/index.js';
+  import { Textarea } from '$lib/components/ui/textarea/index.js';
+  import type { SubmissionResult } from '$lib/server/judge0';
 
   const problemQuery = useQuery(api.problems.get, () =>
     page.params.problemId ? { id: page.params.problemId as Id<'problems'> } : 'skip',
   );
 
-  let label = $state('personal');
-
   function renderProblem(html: string) {
     return DOMPurify.sanitize(html);
   }
+
+  let sourceCode = $state('');
+  let stdinData = $state('');
+  let selectedLanguageId = $state<string | undefined>(undefined);
+
+  let isExecuting = $state(false);
+  let result = $state<SubmissionResult | null>(null);
+  let activeTab = $state('stdout');
+
+  async function executeCode() {
+    if (!selectedLanguageId) return;
+
+    isExecuting = true;
+    result = null;
+
+    try {
+      const submitRes = await fetch('/api/judge0/submissions?wait=true', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source_code: sourceCode,
+          language_id: parseInt(selectedLanguageId, 10),
+          stdin: stdinData || undefined,
+        }),
+      });
+
+      if (!submitRes.ok) throw new Error('Submission failed');
+
+      result = await submitRes.json();
+
+      if (result?.compile_output) {
+        activeTab = 'compile_output';
+      } else if (result?.stderr) {
+        activeTab = 'stderr';
+      } else {
+        activeTab = 'stdout';
+      }
+    } catch (err) {
+      console.error('Execution error:', err);
+    } finally {
+      isExecuting = false;
+    }
+  }
 </script>
 
-<div class="page-wrapper">
-  <!-- <h1>Student ID: {studentId}</h1> -->
-
+<div class="flex h-full w-full flex-1">
   <Resizable.PaneGroup direction="horizontal" class="h-full w-full rounded-lg border">
-    <Resizable.Pane defaultSize={50}>
-      <div class="flex h-full items-center justify-center p-6">
-        <span class="font-semibold">Tiptap</span>
+    <Resizable.Pane defaultSize={50} minSize={20}>
+      <div class="h-full w-full p-4">
+        <Textarea
+          class="h-full w-full resize-none font-mono"
+          placeholder="Write your code here..."
+          bind:value={sourceCode}
+        />
       </div>
     </Resizable.Pane>
 
     <Resizable.Handle />
 
-    <Resizable.Pane defaultSize={50}>
+    <Resizable.Pane defaultSize={50} minSize={20}>
       <Resizable.PaneGroup direction="vertical" class="h-full">
-        <Resizable.Pane defaultSize={55}>
+        <Resizable.Pane defaultSize={70} minSize={15}>
           {#if problemQuery.isLoading}
             <div class="flex h-full items-center justify-center p-6">
               <p class="text-sm text-muted-foreground">Loading...</p>
@@ -69,144 +105,106 @@
 
         <Resizable.Handle />
 
-        <Resizable.Pane defaultSize={75}>
-          <div class="h-full w-full">
-            <Resizable.PaneGroup direction="vertical" class="h-full w-full">
-              <!-- THREE - A (15%) -->
-              <Resizable.Pane defaultSize={25} minSize={10} maxSize={30}>
-                <div class="flex h-full items-center justify-center border-b p-4">
-                  <span class="font-semibold"
-                    ><ButtonGroup.Root class="flex flex-wrap gap-2">
-                      <!-- Back -->
-                      <Button variant="outline" size="icon-sm" aria-label="Go Back">
-                        <ArrowLeft />
-                      </Button>
-
-                      <!-- Main actions -->
-                      <Button variant="outline" size="sm">Archive</Button>
-                      <Button variant="outline" size="sm">Report</Button>
-                      <Button variant="outline" size="sm">Snooze</Button>
-
-                      <!-- Dropdown -->
-                      <DropdownMenu.Root>
-                        <DropdownMenu.Trigger>
-                          {#snippet child({ props })}
-                            <Button {...props} variant="outline" size="icon-sm">
-                              <MoreHorizontal />
-                            </Button>
-                          {/snippet}
-                        </DropdownMenu.Trigger>
-
-                        <DropdownMenu.Content align="end" class="w-52">
-                          <DropdownMenu.Group>
-                            <DropdownMenu.Item>
-                              <MailCheck />
-                              Mark as Read
-                            </DropdownMenu.Item>
-
-                            <DropdownMenu.Item>
-                              <Archive />
-                              Archive
-                            </DropdownMenu.Item>
-                          </DropdownMenu.Group>
-
-                          <DropdownMenu.Separator />
-
-                          <DropdownMenu.Group>
-                            <DropdownMenu.Item>
-                              <Clock />
-                              Snooze
-                            </DropdownMenu.Item>
-
-                            <DropdownMenu.Item>
-                              <CalendarPlus />
-                              Add to Calendar
-                            </DropdownMenu.Item>
-
-                            <DropdownMenu.Item>
-                              <ListFilter />
-                              Add to List
-                            </DropdownMenu.Item>
-
-                            <DropdownMenu.Sub>
-                              <DropdownMenu.SubTrigger>
-                                <Tag />
-                                Label As...
-                              </DropdownMenu.SubTrigger>
-
-                              <DropdownMenu.SubContent>
-                                <DropdownMenu.RadioGroup bind:value={label}>
-                                  <DropdownMenu.RadioItem value="personal">Personal</DropdownMenu.RadioItem>
-
-                                  <DropdownMenu.RadioItem value="work">Work</DropdownMenu.RadioItem>
-
-                                  <DropdownMenu.RadioItem value="other">Other</DropdownMenu.RadioItem>
-                                </DropdownMenu.RadioGroup>
-                              </DropdownMenu.SubContent>
-                            </DropdownMenu.Sub>
-                          </DropdownMenu.Group>
-
-                          <DropdownMenu.Separator />
-
-                          <DropdownMenu.Group>
-                            <DropdownMenu.Item class="text-destructive focus:text-destructive">
-                              <Trash2 />
-                              Trash
-                            </DropdownMenu.Item>
-                          </DropdownMenu.Group>
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Root>
-
-                      <Button variant="outline" size="sm">1</Button>
-                      <Button variant="outline" size="sm">2</Button>
-                      <Button variant="outline" size="sm">3</Button>
-                      <Button variant="outline" size="sm">4</Button>
-                      <Button variant="outline" size="sm">5</Button>
-
-                      <Button variant="outline" size="icon-sm" aria-label="Previous">
-                        <ArrowLeft />
-                      </Button>
-                      <Button variant="outline" size="icon-sm" aria-label="Next">
-                        <ArrowRight />
-                      </Button>
-                    </ButtonGroup.Root></span
-                  >
+        <Resizable.Pane defaultSize={30} minSize={15}>
+          <Resizable.PaneGroup direction="horizontal" class="h-full w-full border-t">
+            <Resizable.Pane defaultSize={50} minSize={20}>
+              <div class="flex h-full flex-col gap-2 p-4">
+                <div class="flex items-center gap-2">
+                  <LanguageSelect bind:value={selectedLanguageId} disabled={isExecuting} />
+                  <Button size="sm" onclick={executeCode} disabled={isExecuting || !selectedLanguageId}>
+                    {#if isExecuting}
+                      <Spinner class="mr-2 h-4 w-4" />
+                      Executing...
+                    {:else}
+                      Execute
+                    {/if}
+                  </Button>
                 </div>
-              </Resizable.Pane>
+                <Textarea
+                  class="flex-1 resize-none font-mono text-sm"
+                  placeholder="Standard Input (stdin)"
+                  bind:value={stdinData}
+                />
+              </div>
+            </Resizable.Pane>
 
-              <Resizable.Handle />
+            <Resizable.Handle />
 
-              <!-- THREE - B (rest 85%) -->
-              <Resizable.Pane defaultSize={85}>
-                <Resizable.PaneGroup direction="horizontal" class="h-full w-full">
-                  <Resizable.Pane defaultSize={50}>
-                    <div class="flex h-full items-center justify-center p-6">
-                      <span class="font-semibold">Input</span>
-                    </div>
-                  </Resizable.Pane>
+            <Resizable.Pane defaultSize={50} minSize={20}>
+              <div class="flex h-full w-full flex-col overflow-hidden p-4">
+                <Tabs.Root bind:value={activeTab} class="flex h-full flex-col overflow-hidden">
+                  <Tabs.List class="h-auto w-full shrink-0 justify-start rounded-none border-b bg-transparent p-0 pb-2">
+                    <Tabs.Trigger value="stdout" class="data-active:bg-primary! data-active:text-primary-foreground!"
+                      >Stdout</Tabs.Trigger
+                    >
+                    <Tabs.Trigger value="stderr" class="data-active:bg-primary! data-active:text-primary-foreground!"
+                      >Stderr</Tabs.Trigger
+                    >
+                    <Tabs.Trigger
+                      value="compile_output"
+                      class="data-active:bg-primary! data-active:text-primary-foreground!">Compile</Tabs.Trigger
+                    >
+                    <Tabs.Trigger value="message" class="data-active:bg-primary! data-active:text-primary-foreground!"
+                      >Message</Tabs.Trigger
+                    >
+                  </Tabs.List>
 
-                  <Resizable.Handle />
-
-                  <Resizable.Pane defaultSize={50}>
-                    <div class="flex h-full items-center justify-center p-6">
-                      <span class="font-semibold">Output</span>
-                    </div>
-                  </Resizable.Pane>
-                </Resizable.PaneGroup>
-              </Resizable.Pane>
-            </Resizable.PaneGroup>
-          </div>
+                  <div class="mt-2 flex-1 overflow-auto rounded-md bg-muted/30 p-2 font-mono text-sm">
+                    {#if !result}
+                      <div class="flex h-full items-center justify-center text-muted-foreground">
+                        Run code to see output...
+                      </div>
+                    {:else}
+                      <Tabs.Content value="stdout" class="m-0 h-full outline-none">
+                        <pre class="whitespace-pre-wrap">{result.stdout || 'No standard output'}</pre>
+                      </Tabs.Content>
+                      <Tabs.Content value="stderr" class="m-0 h-full outline-none">
+                        {#if result.stderr}
+                          <pre class="whitespace-pre-wrap text-destructive">{result.stderr}</pre>
+                        {:else}
+                          <pre class="whitespace-pre-wrap text-success">No standard error</pre>
+                        {/if}
+                      </Tabs.Content>
+                      <Tabs.Content value="compile_output" class="m-0 h-full outline-none">
+                        {#if result.compile_output}
+                          <pre class="whitespace-pre-wrap text-destructive">{result.compile_output}</pre>
+                        {:else}
+                          <pre class="whitespace-pre-wrap text-success">No compilation errors</pre>
+                        {/if}
+                      </Tabs.Content>
+                      <Tabs.Content value="message" class="m-0 h-full outline-none">
+                        <pre class="whitespace-pre-wrap">{result.message || 'No additional messages'}</pre>
+                        <div class="mt-4 grid grid-cols-[100px_1fr] gap-1 text-xs">
+                          {#if result.status}
+                            <div class="font-semibold text-muted-foreground">Status:</div>
+                            <div>{result.status.description}</div>
+                          {/if}
+                          {#if result.time != null}
+                            <div class="font-semibold text-muted-foreground">Time:</div>
+                            <div>{result.time} s</div>
+                          {/if}
+                          {#if result.wall_time != null}
+                            <div class="font-semibold text-muted-foreground">Wall Time:</div>
+                            <div>{result.wall_time} s</div>
+                          {/if}
+                          {#if result.memory != null}
+                            <div class="font-semibold text-muted-foreground">Memory:</div>
+                            <div>{(result.memory / 1024).toFixed(2)} MB</div>
+                          {/if}
+                          {#if result.exit_code != null}
+                            <div class="font-semibold text-muted-foreground">Exit Code:</div>
+                            <div>{result.exit_code}</div>
+                          {/if}
+                        </div>
+                      </Tabs.Content>
+                    {/if}
+                  </div>
+                </Tabs.Root>
+              </div>
+            </Resizable.Pane>
+          </Resizable.PaneGroup>
         </Resizable.Pane>
       </Resizable.PaneGroup>
     </Resizable.Pane>
   </Resizable.PaneGroup>
 </div>
-
-<style>
-  .page-wrapper {
-    height: 100%;
-    width: 100%;
-    flex: 1;
-    display: flex;
-  }
-</style>
