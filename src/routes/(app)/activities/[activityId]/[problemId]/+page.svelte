@@ -125,6 +125,7 @@
         problemId: page.params.problemId as Id<'problems'>,
         activityId: page.params.activityId as Id<'activities'>,
         content: sourceCode,
+        languageId: Number(selectedLanguageId),
       });
       lastSourceCode = sourceCode;
     }
