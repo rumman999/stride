@@ -22,7 +22,7 @@
     result = null;
 
     try {
-      const submitRes = await fetch('/api/judge0/submissions', {
+      const submitRes = await fetch('/api/judge0/submissions?wait=true', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -34,23 +34,7 @@
 
       if (!submitRes.ok) throw new Error('Submission failed');
 
-      const submitData = await submitRes.json();
-      const token = submitData.token;
-
-      let statusId = 1;
-      while (statusId === 1 || statusId === 2) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const pollRes = await fetch(`/api/judge0/submissions/${token}`);
-        if (pollRes.ok) {
-          const pollData = await pollRes.json();
-          statusId = pollData.status.id;
-          if (statusId !== 1 && statusId !== 2) {
-            result = pollData;
-          }
-        } else {
-          throw new Error('Polling failed');
-        }
-      }
+      result = await submitRes.json();
 
       if (result?.compile_output) {
         activeTab = 'compile_output';
