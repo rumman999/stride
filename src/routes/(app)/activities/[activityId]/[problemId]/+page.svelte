@@ -84,9 +84,7 @@
       <Resizable.PaneGroup direction="vertical" class="h-full">
         <Resizable.Pane defaultSize={70} minSize={15}>
           {#if problemQuery.isLoading}
-            <div class="flex h-full items-center justify-center p-6">
-              <p class="text-sm text-muted-foreground">Loading...</p>
-            </div>
+            <div class="flex h-full items-center justify-center text-muted-foreground">Loading...</div>
           {:else if !problemQuery.data}
             <div class="mb-2 text-sm font-medium text-destructive">Error loading question</div>
           {:else}
