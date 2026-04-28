@@ -97,7 +97,8 @@
   },
   "dependencies": {
     "convex": "^1.36.1",
-    "convex-svelte": "^0.0.12"
+    "convex-svelte": "^0.0.12",
+    "isomorphic-dompurify": "^2.35.0"
   },
   "lint-staged": {
     "*": "prettier --write --ignore-unknown"

@@ -1,4 +1,13 @@
 <script lang="ts">
+  import { useConvexClient, useQuery } from 'convex-svelte';
+  import DOMPurify from 'isomorphic-dompurify';
+  import { onMount } from 'svelte';
+
+  import { page } from '$app/state';
+  import { api } from '$convex/_generated/api.js';
+  import type { Id } from '$convex/_generated/dataModel';
+
+  import Tiptap from '$lib/components/editor/Tiptap.svelte';
   import LanguageSelect from '$lib/components/language-select.svelte';
   import { Button } from '$lib/components/ui/button/index.js';
   import * as Resizable from '$lib/components/ui/resizable/index.js';
@@ -6,10 +15,65 @@
   import * as Tabs from '$lib/components/ui/tabs/index.js';
   import { Textarea } from '$lib/components/ui/textarea/index.js';
   import type { SubmissionResult } from '$lib/server/judge0';
+  import { session } from '$lib/session';
+
+  const problemQuery = useQuery(api.problems.get, () =>
+    page.params.problemId ? { id: page.params.problemId as Id<'problems'> } : 'skip',
+  );
+
+  function renderProblem(html: string) {
+    return DOMPurify.sanitize(html);
+  }
 
   let sourceCode = $state('');
   let stdinData = $state('');
   let selectedLanguageId = $state<string | undefined>(undefined);
+  const languageFromId: Record<number, string> = {
+    45: 'x86asm',
+    46: 'bash',
+    47: 'basic',
+    48: 'c',
+    49: 'c',
+    50: 'c',
+    51: 'csharp',
+    52: 'cpp',
+    53: 'cpp',
+    54: 'cpp',
+    55: 'lisp',
+    56: 'd',
+    57: 'elixir',
+    58: 'erlang',
+    59: 'fortran',
+    60: 'go',
+    61: 'haskell',
+    62: 'java',
+    63: 'javascript',
+    64: 'lua',
+    65: 'ocaml',
+    67: 'pascal',
+    68: 'php',
+    69: 'prolog',
+    70: 'python',
+    71: 'python',
+    72: 'ruby',
+    73: 'rust',
+    74: 'typeScript',
+    75: 'c',
+    76: 'cpp',
+    77: 'cobol',
+    78: 'kotlin',
+    79: 'objc',
+    80: 'r',
+    81: 'scala',
+    82: 'sql',
+    83: 'swift',
+    84: 'vb',
+    85: 'perl',
+    86: 'clojure',
+    87: 'fsharp',
+    88: 'groovy',
+  };
+  let tiptapLanguage = $derived(selectedLanguageId ? languageFromId[parseInt(selectedLanguageId, 10)] : 'plaintext');
 
   let isExecuting = $state(false);
   let result = $state<SubmissionResult | null>(null);
@@ -49,18 +113,31 @@
       isExecuting = false;
     }
   }
+
+  let lastSourceCode = '';
+  const client = useConvexClient();
+  function snapshotSave() {
+    if (!$session?.userId) return;
+    if (!page.params.problemId || !page.params.activityId) return;
+    if (sourceCode !== lastSourceCode) {
+      client.mutation(api.snapshots.save, {
+        authorId: $session.userId,
+        problemId: page.params.problemId as Id<'problems'>,
+        activityId: page.params.activityId as Id<'activities'>,
+        content: sourceCode,
+        languageId: Number(selectedLanguageId),
+      });
+      lastSourceCode = sourceCode;
+    }
+    setTimeout(snapshotSave, 5000);
+  }
+  onMount(snapshotSave);
 </script>
 
 <div class="flex h-full w-full flex-1">
   <Resizable.PaneGroup direction="horizontal" class="h-full w-full rounded-lg border">
     <Resizable.Pane defaultSize={50} minSize={20}>
-      <div class="h-full w-full p-4">
-        <Textarea
-          class="h-full w-full resize-none font-mono"
-          placeholder="Write your code here..."
-          bind:value={sourceCode}
-        />
-      </div>
+      <Tiptap language={tiptapLanguage} onUpdate={(text: string) => (sourceCode = text)} />
     </Resizable.Pane>
 
     <Resizable.Handle />
@@ -68,9 +145,22 @@
     <Resizable.Pane defaultSize={50} minSize={20}>
       <Resizable.PaneGroup direction="vertical" class="h-full">
         <Resizable.Pane defaultSize={70} minSize={15}>
-          <div class="flex h-full items-center justify-center p-6">
-            <span class="font-semibold">Question-viewer</span>
-          </div>
+          {#if problemQuery.isLoading}
+            <div class="flex h-full items-center justify-center text-muted-foreground">Loading...</div>
+          {:else if !problemQuery.data}
+            <div class="mb-2 text-sm font-medium text-destructive">Error loading question</div>
+          {:else}
+            <div class="flex h-full flex-col overflow-hidden">
+              <div class="border-b px-4 py-2">
+                <h2 class="text-sm font-semibold">{problemQuery.data.title}</h2>
+              </div>
+              <div class="flex-1 overflow-y-auto px-4 py-3">
+                <p class="text-justify text-sm leading-relaxed break-words whitespace-pre-wrap text-muted-foreground">
+                  {@html renderProblem(problemQuery.data.contentMd)}
+                </p>
+              </div>
+            </div>
+          {/if}
         </Resizable.Pane>
 
         <Resizable.Handle />
