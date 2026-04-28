@@ -9,13 +9,27 @@
   import MoreHorizontal from '@lucide/svelte/icons/more-horizontal';
   import Tag from '@lucide/svelte/icons/tag';
   import Trash2 from '@lucide/svelte/icons/trash-2';
+  import { useQuery } from 'convex-svelte';
+  import DOMPurify from 'isomorphic-dompurify';
+
+  import { page } from '$app/state';
+  import { api } from '$convex/_generated/api.js';
+  import type { Id } from '$convex/_generated/dataModel';
 
   import * as ButtonGroup from '$lib/components/ui/button-group/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
   import * as Resizable from '$lib/components/ui/resizable/index.js';
 
+  const problemQuery = useQuery(api.problems.get, () =>
+    page.params.problemId ? { id: page.params.problemId as Id<'problems'> } : 'skip',
+  );
+
   let label = $state('personal');
+
+  function renderProblem(html: string) {
+    return DOMPurify.sanitize(html);
+  }
 </script>
 
 <div class="page-wrapper">
@@ -33,9 +47,24 @@
     <Resizable.Pane defaultSize={50}>
       <Resizable.PaneGroup direction="vertical" class="h-full">
         <Resizable.Pane defaultSize={55}>
-          <div class="flex h-full items-center justify-center p-6">
-            <span class="font-semibold">Question-viewer</span>
-          </div>
+          {#if problemQuery.isLoading}
+            <div class="flex h-full items-center justify-center p-6">
+              <p class="text-sm text-muted-foreground">Loading...</p>
+            </div>
+          {:else if !problemQuery.data}
+            <div class="mb-2 text-sm font-medium text-destructive">Error loading question</div>
+          {:else}
+            <div class="flex h-full flex-col overflow-hidden">
+              <div class="border-b px-4 py-2">
+                <h2 class="text-sm font-semibold">{problemQuery.data.title}</h2>
+              </div>
+              <div class="flex-1 overflow-y-auto px-4 py-3">
+                <p class="text-justify text-sm leading-relaxed break-words whitespace-pre-wrap text-muted-foreground">
+                  {@html renderProblem(problemQuery.data.contentMd)}
+                </p>
+              </div>
+            </div>
+          {/if}
         </Resizable.Pane>
 
         <Resizable.Handle />
