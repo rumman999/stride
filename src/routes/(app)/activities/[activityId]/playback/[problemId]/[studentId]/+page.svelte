@@ -16,6 +16,9 @@
   import { createHighlighter, type HighlighterCore } from 'shiki';
   import { ShikiMagicMove } from 'shiki-magic-move/svelte';
 
+  import SubmissionResultView from '$lib/components/submission-result-view.svelte';
+  import { getShikiLang } from '$lib/judge0-utils';
+
   import 'shiki-magic-move/dist/style.css';
 
   import { onMount } from 'svelte';
@@ -96,21 +99,6 @@
     });
   });
 
-  // ─── Language mapping (Judge0 ID → shiki lang) ────────────────────────────
-  const judge0ToShikiLang: Record<string, string> = {
-    '71': 'python',
-    '70': 'python',
-    '62': 'java',
-    '63': 'javascript',
-    '74': 'typescript',
-    '75': 'c',
-    '76': 'cpp',
-    '50': 'c',
-    '54': 'cpp',
-    '48': 'c',
-    '52': 'cpp',
-  };
-
   // ─── Playback state ───────────────────────────────────────────────────────
   let currentIndex = $state(0);
   let isPlaying = $state(false);
@@ -158,6 +146,11 @@
     hasRunInitialTests = false;
   });
 
+  // ─── Test case management ─────────────────────────────────────────────────
+  let selectedLanguageId = $state<string | undefined>(undefined);
+  let isExecuting = $state(false);
+  let results = $state(new SvelteMap<string, SubmissionResult>());
+
   // Auto-run tests with last snapshot when ready
   $effect(() => {
     if (totalSnapshots > 0 && testCases.length > 0 && selectedLanguageId && !hasRunInitialTests && !isExecuting) {
@@ -194,10 +187,8 @@
     isPlaying = !isPlaying;
   }
 
-  // ─── Test case management ─────────────────────────────────────────────────
-  let selectedLanguageId = $state<string | undefined>(undefined);
-  let isExecuting = $state(false);
-  let results = $state(new SvelteMap<string, SubmissionResult>());
+  // ─── Language mapping (Judge0 ID → shiki lang) ────────────────────────────
+  const shikiLang = $derived(getShikiLang(selectedLanguageId));
 
   // Auto-detect language from student's snapshots (they save their chosen languageId)
   const snapshotLanguageId = $derived(snapshots.find((s) => s.languageId != null)?.languageId?.toString() ?? undefined);
@@ -217,7 +208,7 @@
     languageAutoSet = false;
   });
 
-  const shikiLang = $derived(selectedLanguageId ? (judge0ToShikiLang[selectedLanguageId] ?? 'python') : 'python');
+  // ─── Verdict helper ───────────────────────────────────────────────────────
 
   function getVerdict(
     tc: { outputData: string },
@@ -573,32 +564,7 @@
 
                   <!-- Result display -->
                   {#if result}
-                    <div class="mt-2 rounded-md bg-muted/30 p-2">
-                      <div class="mb-1 text-xs font-medium text-muted-foreground">Actual Output:</div>
-                      <pre class="font-mono text-xs whitespace-pre-wrap">{result.stdout ?? 'No output'}</pre>
-                      {#if result.stderr}
-                        <div class="mt-1 text-xs text-destructive">
-                          <span class="font-medium">stderr:</span>
-                          <pre class="whitespace-pre-wrap">{result.stderr}</pre>
-                        </div>
-                      {/if}
-                      {#if result.compile_output}
-                        <div class="mt-1 text-xs text-destructive">
-                          <span class="font-medium">compile:</span>
-                          <pre class="whitespace-pre-wrap">{result.compile_output}</pre>
-                        </div>
-                      {/if}
-                      {#if result.time != null || result.memory != null}
-                        <div class="mt-1 flex gap-3 text-xs text-muted-foreground">
-                          {#if result.time != null}
-                            <span>{result.time}s</span>
-                          {/if}
-                          {#if result.memory != null}
-                            <span>{(result.memory / 1024).toFixed(1)}MB</span>
-                          {/if}
-                        </div>
-                      {/if}
-                    </div>
+                    <SubmissionResultView {result} showTabs={false} />
                   {/if}
                 </div>
               {/each}
