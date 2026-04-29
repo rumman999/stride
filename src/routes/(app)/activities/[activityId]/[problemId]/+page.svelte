@@ -155,9 +155,10 @@
                 <h2 class="text-sm font-semibold">{problemQuery.data.title}</h2>
               </div>
               <div class="flex-1 overflow-y-auto px-4 py-3">
-                <p class="text-justify text-sm leading-relaxed break-words whitespace-pre-wrap text-muted-foreground">
+                <div class="prose prose-sm max-w-none text-muted-foreground dark:prose-invert">
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                   {@html renderProblem(problemQuery.data.contentMd)}
-                </p>
+                </div>
               </div>
             </div>
           {/if}
