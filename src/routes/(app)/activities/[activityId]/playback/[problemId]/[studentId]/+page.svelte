@@ -7,7 +7,6 @@
   import PauseIcon from '@lucide/svelte/icons/pause';
   import PlayIcon from '@lucide/svelte/icons/play';
   import PlusIcon from '@lucide/svelte/icons/plus';
-  import RepeatIcon from '@lucide/svelte/icons/repeat';
   import SkipBackIcon from '@lucide/svelte/icons/skip-back';
   import SkipForwardIcon from '@lucide/svelte/icons/skip-forward';
   import Trash2Icon from '@lucide/svelte/icons/trash-2';
@@ -90,10 +89,6 @@
     if (savedSpeed) {
       speedStr = savedSpeed;
     }
-    const savedLoop = localStorage.getItem('stride:playback-loop');
-    if (savedLoop) {
-      isLooping = savedLoop === 'true';
-    }
 
     highlighter = await createHighlighter({
       themes: ['github-dark', 'github-light'],
@@ -121,7 +116,6 @@
   let isPlaying = $state(false);
   let speed = $state(1);
   let speedStr = $state('1');
-  let isLooping = $state(true);
 
   const currentCode = $derived(snapshots[currentIndex]?.content ?? '');
   const lastCode = $derived(snapshots[totalSnapshots - 1]?.content ?? '');
@@ -146,13 +140,6 @@
     speed = parseInt(speedStr, 10);
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('stride:playback-speed', speedStr);
-    }
-  });
-
-  // Sync looping preference
-  $effect(() => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('stride:playback-loop', isLooping.toString());
     }
   });
 
@@ -188,11 +175,7 @@
       if (currentIndex < totalSnapshots - 1) {
         currentIndex++;
       } else {
-        if (isLooping) {
-          currentIndex = 0;
-        } else {
-          isPlaying = false;
-        }
+        currentIndex = 0;
       }
     }, interval);
 
@@ -410,17 +393,6 @@
             title="Jump to last snapshot"
           >
             <FastForwardIcon class="size-4" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            class={'size-8 ' + (isLooping ? 'text-primary' : 'text-muted-foreground')}
-            disabled={totalSnapshots === 0}
-            onclick={() => (isLooping = !isLooping)}
-            title="Toggle loop"
-          >
-            <RepeatIcon class="size-4" />
           </Button>
 
           <div class="mx-2 flex-1">
