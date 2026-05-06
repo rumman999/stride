@@ -1,128 +1,111 @@
 <script lang="ts">
-  import { Editor, Extension } from '@tiptap/core';
-  import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-  import Document from '@tiptap/extension-document';
-  import History from '@tiptap/extension-history';
-  import Paragraph from '@tiptap/extension-paragraph';
-  import Text from '@tiptap/extension-text';
-  import { common, createLowlight } from 'lowlight';
+  import { indentWithTab } from '@codemirror/commands';
+  import { cpp } from '@codemirror/lang-cpp';
+  import { java } from '@codemirror/lang-java';
+  import { javascript } from '@codemirror/lang-javascript';
+  import { python } from '@codemirror/lang-python';
+  import { Compartment, EditorState } from '@codemirror/state';
+  import { oneDark } from '@codemirror/theme-one-dark';
+  import { EditorView, keymap } from '@codemirror/view';
+  import { basicSetup } from 'codemirror';
+  import Moon from 'lucide-svelte/icons/moon';
+  import Sun from 'lucide-svelte/icons/sun';
   import { onDestroy, onMount } from 'svelte';
 
-  // ✅ Svelte 5 props
+  import { Button } from '$lib/components/ui/button';
+
   let { initialContent = '', language = 'cpp', onUpdate, editable = true } = $props();
 
   let element: HTMLElement;
+  let view: EditorView;
 
-  // ✅ Svelte 5 state
-  let editor = $state<Editor | null>(null);
+  let languageConf = new Compartment();
+  let editableConf = new Compartment();
+  let themeConf = new Compartment();
 
-  const lowlight = createLowlight(common);
+  let isEditorDark = $state(true);
 
-  const IDEHelper = Extension.create({
-    name: 'ideHelper',
-    addKeyboardShortcuts() {
-      const insertPair = (pair: string) => () => {
-        const pos = this.editor.state.selection.from;
-        this.editor
-          .chain()
-          .insertContent(pair)
-          .setTextSelection(pos + 1)
-          .run();
-        return true;
-      };
+  function getLanguageExtension(lang: string) {
+    if (!lang) return [];
+    const l = lang.toLowerCase();
+    if (l.includes('c++') || l.includes('cpp') || l === 'c') return cpp();
+    if (l.includes('python')) return python();
+    if (l.includes('java') && !l.includes('script')) return java();
+    if (l.includes('js') || l.includes('javascript') || l.includes('ts')) return javascript();
+    return [];
+  }
 
-      return {
-        Tab: () => {
-          this.editor.commands.insertContent('  ');
-          return true;
-        },
-
-        '(': insertPair('()'),
-        '[': insertPair('[]'),
-        '{': insertPair('{}'),
-        '"': insertPair('""'),
-        "'": insertPair("''"),
-
-        Enter: () => {
-          if (!this.editor.isActive('codeBlock')) return false;
-
-          const { state } = this.editor;
-          const fromPos = state.selection.$from;
-
-          const textNode = fromPos.nodeBefore;
-          let leadingSpace = '';
-
-          if (textNode && textNode.isText) {
-            const text = textNode.text || '';
-            const lines = text.split('\n');
-            const currentLine = lines[lines.length - 1];
-
-            const match = currentLine.match(/^\s*/);
-            if (match) leadingSpace = match[0];
-
-            if (/[{[(]\s*$/.test(currentLine)) {
-              leadingSpace += '  ';
-            }
-          }
-
-          this.editor
-            .chain()
-            .insertContent('\n' + leadingSpace)
-            .run();
-          return true;
-        },
-      };
-    },
+  const baseTheme = EditorView.theme({
+    '&': { height: '100%' },
+    '.cm-scroller': { overflow: 'auto', fontFamily: "'JetBrains Mono', monospace, sans-serif" },
   });
 
   onMount(() => {
-    editor = new Editor({
-      element,
-      editable, // ✅ IMPORTANT
-      autofocus: 'end',
+    let state = EditorState.create({
+      doc: initialContent,
+      extensions: [
+        basicSetup,
+        baseTheme,
+        keymap.of([indentWithTab]),
+        themeConf.of(isEditorDark ? oneDark : []),
+        languageConf.of(getLanguageExtension(language)),
+        editableConf.of(EditorView.editable.of(editable)),
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged && onUpdate) {
+            onUpdate(update.state.doc.toString());
+          }
+        }),
+      ],
+    });
 
-      editorProps: {
-        attributes: {
-          spellcheck: 'false',
-          class: 'focus:outline-none min-h-full font-mono text-sm leading-relaxed',
-        },
-      },
-
-      extensions: [Document, Paragraph, Text, History, CodeBlockLowlight.configure({ lowlight }), IDEHelper],
-
-      content: `<pre><code class="language-${language}">${initialContent}</code></pre>`,
-
-      onUpdate: ({ editor: e }) => {
-        if (!e.isActive('codeBlock')) {
-          e.commands.setCodeBlock({ language });
-        }
-
-        onUpdate?.(e.getText());
-      },
-
-      onSelectionUpdate: ({ editor: e }) => {
-        if (!e.isActive('codeBlock')) {
-          e.commands.setCodeBlock({ language });
-        }
-      },
+    view = new EditorView({
+      state,
+      parent: element,
     });
   });
 
-  // ✅ reactive sync for Svelte 5 props change
   $effect(() => {
-    if (editor) {
-      editor.setEditable(editable);
-      editor.commands.setCodeBlock({ language });
+    if (view) {
+      view.dispatch({
+        effects: [
+          languageConf.reconfigure(getLanguageExtension(language)),
+          editableConf.reconfigure(EditorView.editable.of(editable)),
+          themeConf.reconfigure(isEditorDark ? oneDark : []),
+        ],
+      });
     }
   });
 
   onDestroy(() => {
-    editor?.destroy();
+    if (view) view.destroy();
   });
 </script>
 
-<div class="flex h-full w-full flex-col overflow-hidden bg-[#18181b] text-zinc-100">
-  <div class="flex-1 overflow-y-auto p-6">
-    <div bind:this={element}></div>
+<div class="flex h-full w-full flex-col overflow-hidden rounded-lg border border-border shadow-sm">
+  <div class="flex items-center justify-between border-b border-border bg-muted/40 px-3 py-1.5">
+    <span class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+      {language || 'Code Editor'}
+    </span>
+    <Button
+      variant="ghost"
+      size="sm"
+      class="h-6 w-6 p-0 text-muted-foreground hover:bg-muted hover:text-foreground"
+      onclick={() => (isEditorDark = !isEditorDark)}
+    >
+      {#if isEditorDark}
+        <Sun class="h-3.5 w-3.5" />
+      {:else}
+        <Moon class="h-3.5 w-3.5" />
+      {/if}
+      <span class="sr-only">Toggle Editor Theme</span>
+    </Button>
   </div>
+
+  <div class="flex-1 overflow-hidden" bind:this={element}></div>
 </div>
+
+<style>
+  :global(.cm-editor.cm-focused) {
+    outline: none !important;
+  }
+</style>
